@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: df43b9c9d4bab47f1b941c083db16f30
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 54774
+  packageName: Sci-Fi Warrior
+  packageVersion: 1.0
+  assetPath: Assets/RealisticCharacter/Anim/role_animator_controller.controller
+  uploadId: 103232
