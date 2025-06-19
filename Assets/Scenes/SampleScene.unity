@@ -196,7 +196,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   target: {fileID: 728057745}
-  offset: {x: 0, y: 2, z: 1}
+  offset: {x: 0, y: 2, z: 0}
 --- !u!1 &330585543
 GameObject:
   m_ObjectHideFlags: 0
@@ -351,8 +351,8 @@ MonoBehaviour:
   distance: 5
   xSpeed: 120
   ySpeed: 120
-  yMinLimit: -20
-  yMaxLimit: 60
+  yMin: -20
+  yMax: 60
 --- !u!1 &410087039
 GameObject:
   m_ObjectHideFlags: 0
@@ -499,7 +499,7 @@ MonoBehaviour:
   moveSpeed: 6
   jumpHeight: 3
   gravity: -19.62
-  dashSpeed: 20
+  dashSpeed: 50
   dashDuration: 0.2
   dashCooldown: 1
   groundCheck: {fileID: 38901855}
