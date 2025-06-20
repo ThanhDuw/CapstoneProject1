@@ -1,5 +1,12 @@
 fileFormatVersion: 2
-guid: 0364882f9a8db45dfa89ce8d5bcb95bb
+guid: 2aa62a574ced7024b9f6e9a2d1f75487
+AssetOrigin:
+  serializedVersion: 1
+  productId: 54774
+  packageName: Sci-Fi Warrior
+  packageVersion: 1.0
+  assetPath: Assets/RealisticCharacter/Role/Role_T.fbx
+  uploadId: 103232
 ModelImporter:
   serializedVersion: 22200
   internalIDToNameTable:
@@ -335,7 +342,7 @@ ModelImporter:
     animationImportWarnings: 
     animationRetargetingWarnings: 
     animationDoRetargetingWarnings: 0
-    importAnimatedCustomProperties: 0
+    importAnimatedCustomProperties: 1
     importConstraints: 0
     animationCompression: 1
     animationRotationError: 0.5
@@ -420,10 +427,3 @@ ModelImporter:
   userData: 
   assetBundleName: 
   assetBundleVariant: 
-AssetOrigin:
-  serializedVersion: 1
-  productId: 54774
-  packageName: Sci-Fi Warrior
-  packageVersion: 1.0
-  assetPath: Assets/RealisticCharacter/Role/Role_T.fbx
-  uploadId: 103232
