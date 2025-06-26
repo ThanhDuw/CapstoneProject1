@@ -31,6 +31,11 @@ public class PlayerMovement : MonoBehaviour
     private float dashTimer = 0f;
     private float dashCooldownTimer = 0f;
 
+<<<<<<< HEAD
+=======
+    public float sprintBonus = 5f; // Tăng thêm khi giữ Q
+
+>>>>>>> Thanh
     void Start()
     {
         controller = GetComponent<CharacterController>();
@@ -75,8 +80,18 @@ public class PlayerMovement : MonoBehaviour
         }
         else
         {
+<<<<<<< HEAD
             // Move thường
             controller.Move(moveInput * moveSpeed * Time.deltaTime);
+=======
+            // Chạy nhanh khi đè Q + có hướng di chuyển
+            bool isSprinting = Input.GetKey(KeyCode.Q) && moveInput.magnitude > 0f;
+            float currentSpeed = isSprinting ? moveSpeed + sprintBonus : moveSpeed;
+
+            controller.Move(moveInput * currentSpeed * Time.deltaTime);
+            //// Move thường
+            //controller.Move(moveInput * moveSpeed * Time.deltaTime);
+>>>>>>> Thanh
         }
 
         // Jump
@@ -100,6 +115,10 @@ public class PlayerMovement : MonoBehaviour
         if (animator != null)
         {
             animator.SetFloat("Speed", moveInput.magnitude);
+<<<<<<< HEAD
+=======
+            animator.SetBool("isSprinting", Input.GetKey(KeyCode.Q) && moveInput.magnitude > 0f);
+>>>>>>> Thanh
         }
 
         // Cập nhật cooldown dash
