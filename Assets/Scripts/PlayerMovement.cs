@@ -42,11 +42,23 @@ public class PlayerMovement : MonoBehaviour
 
     void Update()
     {
+        // Jump
+        if (Input.GetButtonDown("Jump") && isGrounded)
+        {
+            velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
+
+            if (animator != null)
+                animator.SetBool("isJumping", true); // Bắt đầu Jump
+        }
+
         // Ground check
         isGrounded = Physics.CheckSphere(groundCheck.position, groundDistance, groundMask);
         if (isGrounded && velocity.y < 0)
         {
             velocity.y = -2f;
+
+            if (animator != null)
+                animator.SetBool("isJumping", false); // Kết thúc Jump khi chạm đất
         }
 
         // Lấy input
@@ -64,6 +76,9 @@ public class PlayerMovement : MonoBehaviour
             isDashing = true;
             dashTimer = dashDuration;
             dashCooldownTimer = dashCooldown;
+
+            if (animator != null)
+                animator.SetBool("isDashing", true); // Bắt đầu Dash
         }
 
         if (isDashing)
@@ -73,6 +88,8 @@ public class PlayerMovement : MonoBehaviour
             if (dashTimer <= 0f)
             {
                 isDashing = false;
+                if (animator != null)
+                    animator.SetBool("isDashing", false); // Kết thúc Dash
             }
         }
         else
@@ -86,11 +103,7 @@ public class PlayerMovement : MonoBehaviour
             //controller.Move(moveInput * moveSpeed * Time.deltaTime);
         }
 
-        // Jump
-        if (Input.GetButtonDown("Jump") && isGrounded)
-        {
-            velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
-        }
+        
 
         // Gravity
         velocity.y += gravity * Time.deltaTime;
