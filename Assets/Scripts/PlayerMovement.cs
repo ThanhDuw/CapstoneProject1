@@ -31,11 +31,14 @@ public class PlayerMovement : MonoBehaviour
     private float dashTimer = 0f;
     private float dashCooldownTimer = 0f;
 
-<<<<<<< HEAD
-=======
     public float sprintBonus = 5f; // Tăng thêm khi giữ Q
 
->>>>>>> Thanh
+    [SerializeField] private Transform firePoint; // Gắn điểm bắn (nòng súng) trong Inspector
+
+    [Header("Hiệu ứng")]
+    public GameObject hitEffectPrefab; // Prefab hiệu ứng trúng đạn (tùy chọn)
+    public Animator gunAnimator; // Gắn animator từ model/súng
+
     void Start()
     {
         controller = GetComponent<CharacterController>();
@@ -45,11 +48,28 @@ public class PlayerMovement : MonoBehaviour
 
     void Update()
     {
+
+        if (Input.GetMouseButtonDown(0)) // Chuột trái
+        {
+            Shoot();
+        }
+        // Jump
+        if (Input.GetButtonDown("Jump") && isGrounded)
+        {
+            velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
+
+            if (animator != null)
+                animator.SetBool("isJumping", true); // Bắt đầu Jump
+        }
+
         // Ground check
         isGrounded = Physics.CheckSphere(groundCheck.position, groundDistance, groundMask);
         if (isGrounded && velocity.y < 0)
         {
             velocity.y = -2f;
+
+            if (animator != null)
+                animator.SetBool("isJumping", false); // Kết thúc Jump khi chạm đất
         }
 
         // Lấy input
@@ -67,6 +87,9 @@ public class PlayerMovement : MonoBehaviour
             isDashing = true;
             dashTimer = dashDuration;
             dashCooldownTimer = dashCooldown;
+
+            if (animator != null)
+                animator.SetBool("isDashing", true); // Bắt đầu Dash
         }
 
         if (isDashing)
@@ -76,14 +99,12 @@ public class PlayerMovement : MonoBehaviour
             if (dashTimer <= 0f)
             {
                 isDashing = false;
+                if (animator != null)
+                    animator.SetBool("isDashing", false); // Kết thúc Dash
             }
         }
         else
         {
-<<<<<<< HEAD
-            // Move thường
-            controller.Move(moveInput * moveSpeed * Time.deltaTime);
-=======
             // Chạy nhanh khi đè Q + có hướng di chuyển
             bool isSprinting = Input.GetKey(KeyCode.Q) && moveInput.magnitude > 0f;
             float currentSpeed = isSprinting ? moveSpeed + sprintBonus : moveSpeed;
@@ -91,14 +112,9 @@ public class PlayerMovement : MonoBehaviour
             controller.Move(moveInput * currentSpeed * Time.deltaTime);
             //// Move thường
             //controller.Move(moveInput * moveSpeed * Time.deltaTime);
->>>>>>> Thanh
         }
 
-        // Jump
-        if (Input.GetButtonDown("Jump") && isGrounded)
-        {
-            velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
-        }
+        
 
         // Gravity
         velocity.y += gravity * Time.deltaTime;
@@ -115,13 +131,36 @@ public class PlayerMovement : MonoBehaviour
         if (animator != null)
         {
             animator.SetFloat("Speed", moveInput.magnitude);
-<<<<<<< HEAD
-=======
             animator.SetBool("isSprinting", Input.GetKey(KeyCode.Q) && moveInput.magnitude > 0f);
->>>>>>> Thanh
         }
 
         // Cập nhật cooldown dash
         dashCooldownTimer -= Time.deltaTime;
+    }
+
+    void Shoot()
+    {
+        // Kích hoạt animation bắn
+        if (gunAnimator != null)
+        {
+            gunAnimator.SetTrigger("Fire");
+        }
+
+        if (firePoint == null)
+        {
+            Debug.LogWarning("FirePoint is not assigned!");
+            return;
+        }
+
+        Ray ray = new Ray(firePoint.position, firePoint.forward);
+
+        if (Physics.Raycast(ray, out RaycastHit hit, 100f))
+        {
+            Debug.Log($"Raycast hit: {hit.collider.name}");
+        }
+        else
+        {
+            Debug.Log("Raycast missed");
+        }
     }
 }
