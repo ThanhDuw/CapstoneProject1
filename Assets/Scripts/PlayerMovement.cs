@@ -33,6 +33,12 @@ public class PlayerMovement : MonoBehaviour
 
     public float sprintBonus = 5f; // Tăng thêm khi giữ Q
 
+    [SerializeField] private Transform firePoint; // Gắn điểm bắn (nòng súng) trong Inspector
+
+    [Header("Hiệu ứng")]
+    public GameObject hitEffectPrefab; // Prefab hiệu ứng trúng đạn (tùy chọn)
+    public Animator gunAnimator; // Gắn animator từ model/súng
+
     void Start()
     {
         controller = GetComponent<CharacterController>();
@@ -42,6 +48,11 @@ public class PlayerMovement : MonoBehaviour
 
     void Update()
     {
+
+        if (Input.GetMouseButtonDown(0)) // Chuột trái
+        {
+            Shoot();
+        }
         // Jump
         if (Input.GetButtonDown("Jump") && isGrounded)
         {
@@ -125,5 +136,31 @@ public class PlayerMovement : MonoBehaviour
 
         // Cập nhật cooldown dash
         dashCooldownTimer -= Time.deltaTime;
+    }
+
+    void Shoot()
+    {
+        // Kích hoạt animation bắn
+        if (gunAnimator != null)
+        {
+            gunAnimator.SetTrigger("Fire");
+        }
+
+        if (firePoint == null)
+        {
+            Debug.LogWarning("FirePoint is not assigned!");
+            return;
+        }
+
+        Ray ray = new Ray(firePoint.position, firePoint.forward);
+
+        if (Physics.Raycast(ray, out RaycastHit hit, 100f))
+        {
+            Debug.Log($"Raycast hit: {hit.collider.name}");
+        }
+        else
+        {
+            Debug.Log("Raycast missed");
+        }
     }
 }
