@@ -21,6 +21,14 @@ public class PlayerMovement : MonoBehaviour
     public Transform cameraTransform;         // Gắn MainCamera
     public Transform modelTransform;          // Gắn object là model (có Animator)
 
+    [Header("Combat")]
+    public GameObject staff;                  // Gậy (hiện/ẩn)
+    public float staffHideDelay = 5f;         // 5s không dùng thì ẩn
+    public float comboMaxDelay = 0f;          // 0s để nối combo
+    private int comboStep = 0;                // 1 → 2 → 3
+    private float lastComboTime = -999f;      // Thời điểm nhấn gần nhất
+    private float staffTimer = 0f;            // Đếm ngược để ẩn gậy
+
     private CharacterController controller;
     private Animator animator;
 
@@ -61,6 +69,7 @@ public class PlayerMovement : MonoBehaviour
             if (animator != null)
                 animator.SetBool("isJumping", true); // Bắt đầu Jump
         }
+     
 
         // Ground check
         isGrounded = Physics.CheckSphere(groundCheck.position, groundDistance, groundMask);
@@ -136,6 +145,8 @@ public class PlayerMovement : MonoBehaviour
 
         // Cập nhật cooldown dash
         dashCooldownTimer -= Time.deltaTime;
+
+        HandleComboAttack();
     }
 
     void Shoot()
@@ -161,6 +172,48 @@ public class PlayerMovement : MonoBehaviour
         else
         {
             Debug.Log("Raycast missed");
+        }
+    }
+    void HandleComboAttack()
+    {
+        if (Input.GetMouseButtonDown(1))
+        {
+            // Hiện gậy nếu đang ẩn
+            if (staff != null && !staff.activeSelf)
+                staff.SetActive(true);
+
+            comboStep++;
+            if (comboStep > 3)
+                comboStep = 1;
+
+            staffTimer = staffHideDelay;
+
+            if (animator != null)
+            {
+                animator.SetInteger("attackIndex", comboStep);
+                animator.SetTrigger("Attack");
+            }
+
+            Debug.Log("Combo Step: " + comboStep);
+        }
+
+        // Ẩn gậy sau thời gian
+        if (staff != null && staff.activeSelf)
+        {
+            staffTimer -= Time.deltaTime;
+            if (staffTimer <= 0f)
+                staff.SetActive(false);
+        }
+    }
+
+    public void EndAttack()
+    {
+        comboStep = 0;
+        if (animator != null)
+        {
+            animator.ResetTrigger("Attack");
+            animator.SetInteger("attackIndex", 0);     // Đưa animator về Idle
+            animator.CrossFade("Idle", 0.01f);         // ← Ép chuyển về Idle luôn (bảo hiểm)
         }
     }
 }
