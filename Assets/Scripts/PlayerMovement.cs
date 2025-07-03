@@ -29,6 +29,10 @@ public class PlayerMovement : MonoBehaviour
     private float lastComboTime = -999f;      // Thời điểm nhấn gần nhất
     private float staffTimer = 0f;            // Đếm ngược để ẩn gậy
 
+    [Header("VFX")]
+    public GameObject meleeHitEffect; // Prefab VFX
+    public Transform vfxSpawnPoint;   // Gắn điểm đầu gậy (vị trí spawn)
+
     private CharacterController controller;
     private Animator animator;
 
@@ -46,6 +50,8 @@ public class PlayerMovement : MonoBehaviour
     [Header("Hiệu ứng")]
     public GameObject hitEffectPrefab; // Prefab hiệu ứng trúng đạn (tùy chọn)
     public Animator gunAnimator; // Gắn animator từ model/súng
+
+
 
     void Start()
     {
@@ -206,14 +212,25 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    public void EndAttack()
+    public void MeleeAttackEnd()
     {
+        if (meleeHitEffect != null && vfxSpawnPoint != null)
+        {
+            Instantiate(meleeHitEffect, vfxSpawnPoint.position, vfxSpawnPoint.rotation);
+            Debug.Log("Spawn VFX at: " + vfxSpawnPoint.position);
+        }
+        else
+        {
+            Debug.LogWarning("VFX hoặc Spawn Point chưa được gán.");
+        }
+
         comboStep = 0;
+
         if (animator != null)
         {
             animator.ResetTrigger("Attack");
-            animator.SetInteger("attackIndex", 0);     // Đưa animator về Idle
-            animator.CrossFade("Idle", 0.01f);         // ← Ép chuyển về Idle luôn (bảo hiểm)
+            animator.SetInteger("attackIndex", 0);
+            animator.CrossFade("Idle", 0.01f); // Ép về Idle
         }
     }
 }
