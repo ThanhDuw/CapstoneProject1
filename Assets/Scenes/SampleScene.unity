@@ -2384,9 +2384,9 @@ MonoBehaviour:
   cameraTransform: {fileID: 1886115123}
   modelTransform: {fileID: 2100194186}
   staff: {fileID: 417529539}
-  staffHideDelay: 2
+  staffHideDelay: 0.6
   comboMaxDelay: 1
-  meleeHitEffect: {fileID: 5313456068782518071, guid: 50f1354827c77ef4b99c4dca0ee3411d, type: 3}
+  meleeHitEffect: {fileID: 9177886612219991525, guid: f90fc7acf1ef2fa4c85896a9afc17028, type: 3}
   vfxSpawnPoint: {fileID: 2015978821}
   sprintBonus: 5
   firePoint: {fileID: 1972104023}
