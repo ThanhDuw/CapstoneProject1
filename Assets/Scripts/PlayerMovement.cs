@@ -24,13 +24,16 @@ public class PlayerMovement : MonoBehaviour
     [Header("Combat")]
     public GameObject staff;                  // Gậy (hiện/ẩn)
     public float staffHideDelay = 5f;         // 5s không dùng thì ẩn
-    public float comboMaxDelay = 0f;          // 0s để nối combo
-    private int comboStep = 0;                // 1 → 2 → 3
-    private float lastComboTime = -999f;      // Thời điểm nhấn gần nhất
+    private int comboStep = 0;         // 1 → 2 → 3
+    private int requestedComboStep = 0; // combo player muốn (tăng theo lần nhấn)
+    private bool isAttacking = false;
     private float staffTimer = 0f;            // Đếm ngược để ẩn gậy
 
-    [Header("VFX")]
-    public GameObject meleeHitEffect; // Prefab VFX
+    [Header("Combo VFX")]
+    public GameObject[] comboVFX; // Gắn 3 hiệu ứng tương ứng combo 1, 2, 3
+    public Transform vfxSpawnPointProjectile;  // Vị trí spawn VFX dạng bay
+
+    [Header("VFX")]   
     public Transform vfxSpawnPoint;   // Gắn điểm đầu gậy (vị trí spawn)
 
     private CharacterController controller;
@@ -50,7 +53,7 @@ public class PlayerMovement : MonoBehaviour
     [Header("Hiệu ứng")]
     public GameObject hitEffectPrefab; // Prefab hiệu ứng trúng đạn (tùy chọn)
     public Animator gunAnimator; // Gắn animator từ model/súng
-
+    public float projectileForce = 500f; // Lực đẩy ra trước
 
 
     void Start()
@@ -184,23 +187,25 @@ public class PlayerMovement : MonoBehaviour
     {
         if (Input.GetMouseButtonDown(1))
         {
+            // Nếu chưa đánh gì thì bắt đầu Combo1
+            if (!isAttacking)
+            {
+                comboStep = 1;
+                requestedComboStep = 1;
+                PlayComboAnimation(comboStep);
+                isAttacking = true;
+            }
+            else
+            {
+                // Nếu đang đánh thì tăng combo mong muốn
+                requestedComboStep = Mathf.Clamp(requestedComboStep + 1, 1, 3);
+            }
+
             // Hiện gậy nếu đang ẩn
             if (staff != null && !staff.activeSelf)
                 staff.SetActive(true);
 
-            comboStep++;
-            if (comboStep > 3)
-                comboStep = 1;
-
             staffTimer = staffHideDelay;
-
-            if (animator != null)
-            {
-                animator.SetInteger("attackIndex", comboStep);
-                animator.SetTrigger("Attack");
-            }
-
-            Debug.Log("Combo Step: " + comboStep);
         }
 
         // Ẩn gậy sau thời gian
@@ -212,25 +217,68 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
+    void PlayComboAnimation(int step)
+    {
+        if (animator != null)
+        {
+            animator.SetInteger("attackIndex", step);
+            animator.SetTrigger("Attack");
+            Debug.Log("Play Combo Step: " + step);
+        }
+    }
+
     public void MeleeAttackEnd()
     {
-        if (meleeHitEffect != null && vfxSpawnPoint != null)
+        
+        // Kiểm tra có yêu cầu combo tiếp không
+        if (requestedComboStep > comboStep && comboStep < 3)
         {
-            Instantiate(meleeHitEffect, vfxSpawnPoint.position, vfxSpawnPoint.rotation);
-            Debug.Log("Spawn VFX at: " + vfxSpawnPoint.position);
+            comboStep++;
+            PlayComboAnimation(comboStep);
         }
         else
         {
-            Debug.LogWarning("VFX hoặc Spawn Point chưa được gán.");
-        }
-
-        comboStep = 0;
-
-        if (animator != null)
-        {
+            // Kết thúc combo
             animator.ResetTrigger("Attack");
             animator.SetInteger("attackIndex", 0);
-            animator.CrossFade("Idle", 0.01f); // Ép về Idle
+            animator.CrossFade("EllenIdle", 0.1f);
+
+            isAttacking = false;
+            comboStep = 0;
+            requestedComboStep = 0;
+        }
+    }
+
+    //effect cho từng combo
+    public void SpawnComboVFX()
+    {
+        int index = Mathf.Clamp(comboStep - 1, 0, comboVFX.Length - 1);
+
+        if (comboVFX.Length > index && comboVFX[index] != null)
+        {
+            Transform spawnPoint = comboStep == 3 && vfxSpawnPointProjectile != null
+                ? vfxSpawnPointProjectile
+                : vfxSpawnPoint;
+
+            if (spawnPoint != null)
+            {
+                GameObject vfx = Instantiate(comboVFX[index], spawnPoint.position, spawnPoint.rotation);
+
+                if (comboStep == 3)
+                {
+                    Rigidbody rb = vfx.GetComponent<Rigidbody>();
+                    if (rb != null)
+                    {
+                        rb.AddForce(spawnPoint.forward * projectileForce); // Bay ra trước
+                    }
+                    else
+                    {
+                        Debug.LogWarning("VFX combo 3 không có Rigidbody.");
+                    }
+                }
+
+                Debug.Log("Spawn VFX Combo " + comboStep);
+            }
         }
     }
 }
