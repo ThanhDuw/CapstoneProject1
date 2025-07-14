@@ -10,12 +10,22 @@ public class EnemyAI : MonoBehaviour
     public float health = 100f;
     public float retreatThreshold = 30f; // Nếu máu thấp hơn thì chạy trốn
 
+    public float attackRadius = 1.5f;      // bán kính đánh trúng
+    public LayerMask playerLayer;          // layer của player
+    private bool hasDealtDamage = false;   // tránh gây damage nhiều lần
+    public float attackCooldown = 1.0f;
+    private float attackTimer = 0f;
+
     private NavMeshAgent agent;
     private Animator animator;
 
     private Vector3 originalPosition;
-    private enum State { Idle, Chase, Attack, Retreat, Return }
+    private enum State { Idle, Roar, Chase, Attack, Retreat, Return }
     private State currentState;
+
+    public float roarDuration = 1.5f;
+    private float roarTimer = 0f;
+    private bool hasRoared = false;
 
 
     void Start()
@@ -40,16 +50,38 @@ public class EnemyAI : MonoBehaviour
         }
         else if (distance <= detectionRange)
         {
-            currentState = State.Chase;
+            if (!hasRoared)
+            {
+                currentState = State.Roar;
+            }
+            else
+            {
+                currentState = State.Chase;
+            }
         }
         else
         {
-            // Nếu đang ở xa vị trí gốc thì quay về
+            // Mất dấu player → reset roar
+            hasRoared = false;
+            roarTimer = 0f;
+
             float backDistance = Vector3.Distance(transform.position, originalPosition);
             if (backDistance > 0.5f)
                 currentState = State.Return;
             else
                 currentState = State.Idle;
+        }
+
+        if (distance > detectionRange)
+        {
+            hasRoared = false;
+            roarTimer = 0f;
+        }
+
+        if (currentState != State.Attack)
+        {
+            hasDealtDamage = false;
+            attackTimer = 0f;
         }
 
         UpdateState();
@@ -71,13 +103,48 @@ public class EnemyAI : MonoBehaviour
                 animator.SetBool("isAttacking", false);
                 break;
 
+            case State.Roar:
+                agent.isStopped = true;
+                agent.velocity = Vector3.zero;
+                transform.LookAt(player);
+                animator.SetBool("isRunning", false);
+                animator.SetBool("isAttacking", false);
+                animator.SetTrigger("Roar");
+
+                roarTimer += Time.deltaTime;
+                if (roarTimer >= roarDuration)
+                {
+                    hasRoared = true;
+                    currentState = State.Chase;
+                    roarTimer = 0f;
+                }
+                break;
+
             case State.Attack:
                 agent.isStopped = true;
                 agent.velocity = Vector3.zero;
                 transform.LookAt(player);
-                animator.applyRootMotion = false;  // nếu cần
+                animator.applyRootMotion = false;
                 animator.SetBool("isRunning", false);
                 animator.SetBool("isAttacking", true);
+
+                attackTimer += Time.deltaTime;
+
+                if (!hasDealtDamage && attackTimer >= attackCooldown)
+                {
+                    Collider[] hits = Physics.OverlapSphere(transform.position + transform.forward * 1.0f, attackRadius, playerLayer);
+                    foreach (Collider hit in hits)
+                    {
+                        if (hit.transform == player)
+                        {
+                            Debug.Log("Enemy hit player");
+                            hit.GetComponent<PlayerHealth>()?.TakeDamage(20f);
+                            hasDealtDamage = true;
+                            attackTimer = 0f;
+                            break;
+                        }
+                    }
+                }
                 break;
 
             case State.Retreat:
@@ -113,5 +180,11 @@ public class EnemyAI : MonoBehaviour
         animator.SetTrigger("Die");
         agent.isStopped = true;
         this.enabled = false;
+    }
+
+    void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(transform.position, attackRadius);
     }
 }
