@@ -172,6 +172,7 @@ public class EnemyAI : MonoBehaviour
         if (health <= 0)
         {
             Die();
+            
         }
     }
 
@@ -180,6 +181,8 @@ public class EnemyAI : MonoBehaviour
         animator.SetTrigger("Die");
         agent.isStopped = true;
         this.enabled = false;
+        // Xóa enemy sau 2 giây
+        Destroy(gameObject, 2f);
     }
 
     void OnDrawGizmosSelected()

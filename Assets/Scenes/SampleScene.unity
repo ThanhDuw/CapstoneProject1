@@ -2567,7 +2567,7 @@ MonoBehaviour:
   retreatRange: 5
   health: 100
   retreatThreshold: 30
-  attackRadius: 5.08
+  attackRadius: 5.63
   playerLayer:
     serializedVersion: 2
     m_Bits: 128
@@ -2925,6 +2925,7 @@ MonoBehaviour:
   dashSpeed: 20
   dashDuration: 0.2
   dashCooldown: 1
+  gunDamage: 10
   groundCheck: {fileID: 1033928863}
   groundDistance: 0.4
   groundMask:

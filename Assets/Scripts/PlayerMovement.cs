@@ -12,6 +12,8 @@ public class PlayerMovement : MonoBehaviour
     public float dashDuration = 0.2f;
     public float dashCooldown = 1f;
 
+    public float gunDamage = 10f;
+
     [Header("Ground Check")]
     public Transform groundCheck;
     public float groundDistance = 0.4f;
@@ -177,6 +179,20 @@ public class PlayerMovement : MonoBehaviour
         if (Physics.Raycast(ray, out RaycastHit hit, 100f))
         {
             Debug.Log($"Raycast hit: {hit.collider.name}");
+
+            // Gây damage nếu trúng enemy
+            EnemyAI enemy = hit.collider.GetComponent<EnemyAI>();
+            if (enemy != null)
+            {
+                enemy.TakeDamage(gunDamage); // Gây 10 damage
+                Debug.Log("Enemy bị bắn trúng! Gây 10 damage.");
+            }
+
+            // Spawn hiệu ứng trúng (nếu có)
+            if (hitEffectPrefab != null)
+            {
+                Instantiate(hitEffectPrefab, hit.point, Quaternion.LookRotation(hit.normal));
+            }
         }
         else
         {
@@ -263,6 +279,9 @@ public class PlayerMovement : MonoBehaviour
             if (spawnPoint != null)
             {
                 GameObject vfx = Instantiate(comboVFX[index], spawnPoint.position, spawnPoint.rotation);
+
+                // Tự hủy sau 2 giây
+                Destroy(vfx, 2f);
 
                 if (comboStep == 3)
                 {
