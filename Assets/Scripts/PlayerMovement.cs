@@ -57,12 +57,26 @@ public class PlayerMovement : MonoBehaviour
     public Animator gunAnimator; // Gắn animator từ model/súng
     public float projectileForce = 500f; // Lực đẩy ra trước
 
+    private float originalGunDamage; // Ghi nhớ damage gốc
+    private float buffTimer = 0f;    // Đếm thời gian buff
+
 
     void Start()
     {
         controller = GetComponent<CharacterController>();
         animator = modelTransform.GetComponent<Animator>(); // Animator nằm trong model
         Cursor.lockState = CursorLockMode.Locked;
+    }
+    void Awake()
+    {
+        originalGunDamage = gunDamage;
+    }
+
+    public void ApplyDamageBuff(float bonusDamage, float duration)
+    {
+        gunDamage = originalGunDamage + bonusDamage;
+        buffTimer = duration;
+        Debug.Log($"[BUFF] Tăng sát thương lên {gunDamage} trong {duration} giây.");
     }
 
     void Update()
@@ -158,7 +172,18 @@ public class PlayerMovement : MonoBehaviour
         dashCooldownTimer -= Time.deltaTime;
 
         HandleComboAttack();
-    }
+
+        // Theo dõi thời gian buff sát thương
+        if (buffTimer > 0f)
+        {
+            buffTimer -= Time.deltaTime;
+            if (buffTimer <= 0f)
+            {
+                gunDamage = originalGunDamage;
+                Debug.Log("[BUFF] Hết thời gian, sát thương trở lại: " + gunDamage);
+            }
+        }
+    }  
 
     void Shoot()
     {

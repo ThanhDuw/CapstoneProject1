@@ -27,6 +27,11 @@ public class EnemyAI : MonoBehaviour
     private float roarTimer = 0f;
     private bool hasRoared = false;
 
+    [Header("Loot Settings")]
+    public GameObject[] lootPrefabs;       // Các vật phẩm có thể rơi
+    [Range(0f, 1f)]
+    public float dropChance = 0.9f;        // Xác suất rơi (30%)
+
 
     void Start()
     {
@@ -34,6 +39,7 @@ public class EnemyAI : MonoBehaviour
         animator = GetComponent<Animator>();
         currentState = State.Idle;
         originalPosition = transform.position;
+
     }
 
     void Update()
@@ -165,6 +171,18 @@ public class EnemyAI : MonoBehaviour
         }
     }
 
+    //Hàm rớt vật phẩm
+    void TryDropLoot()
+    {
+        if (lootPrefabs.Length == 0) return;
+
+        if (Random.value <= dropChance)
+        {
+            int index = Random.Range(0, lootPrefabs.Length);
+            Instantiate(lootPrefabs[index], transform.position + Vector3.up * 0.5f, Quaternion.identity);
+        }
+    }
+
     // Hàm để nhận sát thương
     public void TakeDamage(float damage)
     {
@@ -181,6 +199,7 @@ public class EnemyAI : MonoBehaviour
         animator.SetTrigger("Die");
         agent.isStopped = true;
         this.enabled = false;
+        TryDropLoot(); // ← Gọi hàm rớt vật phẩm
         // Xóa enemy sau 2 giây
         Destroy(gameObject, 2f);
     }

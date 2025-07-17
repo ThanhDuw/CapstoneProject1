@@ -98,7 +98,7 @@ public class BossAI : MonoBehaviour
 
                 if (!hasStartedGongAnim)
                 {
-                    animator.SetTrigger("Gong");           // ✅ chỉ gọi 1 lần
+                    animator.SetTrigger("Gong");           //  chỉ gọi 1 lần
                     hasStartedGongAnim = true;
                 }
 
