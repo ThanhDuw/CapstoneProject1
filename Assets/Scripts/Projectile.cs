@@ -1,16 +1,23 @@
 ﻿using UnityEngine;
-
+using System.Collections;
 public class Projectile : MonoBehaviour
 {
     public float speed = 10f;
     public float destroyAfterSeconds = 2f;
+    public float damage = 50f;
+    private float finalDamage;
 
     [Header("Target Tags")]
     public string[] targetTags; // Mảng các tag mục tiêu (Enemy, Boss, Dummy...)
 
     void Start()
     {
-        Destroy(gameObject, destroyAfterSeconds); // Tự hủy sau X giây
+        // Lấy buff từ nơi lưu 
+        float damageBuff = PlayerCombat.Instance != null ? PlayerCombat.Instance.currentDamageBuff : 0f;
+
+        finalDamage = damage + damageBuff;
+
+        Destroy(gameObject, destroyAfterSeconds);
     }
 
     void Update()
@@ -20,12 +27,31 @@ public class Projectile : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (IsTargetTag(other.tag))
+        SmallEnemyAI enemy = other.GetComponent<SmallEnemyAI>();
+        if (enemy != null)
         {
-            Debug.Log("Projectile hit: " + other.name + " with tag: " + other.tag);
-            // (Tùy chọn: Gây damage hoặc hiệu ứng ở đây)
+            enemy.TakeDamage(finalDamage); // ← dùng finalDamage
+            Debug.Log("Trúng " + other.name + " - Gây damage: " + finalDamage);
+            Destroy(gameObject);
+            return;
+        }
 
-            Destroy(gameObject); // Hủy sau khi va chạm
+        EnemyAI enemyAI = other.GetComponent<EnemyAI>();
+        if (enemyAI != null)
+        {
+            enemyAI.TakeDamage(finalDamage);
+            Debug.Log("Trúng " + other.name + " - Gây damage: " + finalDamage);
+            Destroy(gameObject);
+            return;
+        }
+
+        BossAI bossAI = other.GetComponent<BossAI>();
+        if (bossAI != null)
+        {
+            bossAI.TakeDamage(finalDamage);
+            Debug.Log("Trúng " + other.name + " - Gây damage: " + finalDamage);
+            Destroy(gameObject);
+            return;
         }
     }
 

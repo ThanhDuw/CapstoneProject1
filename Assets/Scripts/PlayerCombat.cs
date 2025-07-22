@@ -1,46 +1,51 @@
 ﻿using UnityEngine;
+using System.Collections;
 
 public class PlayerCombat : MonoBehaviour
 {
-    [Header("Combat Settings")]
-    public float attackRange = 1.5f;
-    public int damage = 10;
-    public LayerMask enemyLayer;
-    public Transform attackPoint; // điểm phát ra đòn (trước mặt)
+    public int damage = 20;
+    public Collider weaponCollider;
+    public static PlayerCombat Instance;
 
-    public GameObject hitEffectPrefab; // hiệu ứng nếu trúng (tuỳ chọn)
+    public float currentDamageBuff = 0f; 
 
-    // Hàm này sẽ được gọi từ Animation Event
+    void Start()
+    {
+        if (weaponCollider != null)
+            weaponCollider.enabled = false; // Luôn tắt khi bắt đầu
+    }
+    void Awake()
+    {
+        Instance = this;
+    }
+
+    // Gọi từ animation event để bắt đầu gây damage
     public void MeleeAttackStart()
     {
         Debug.Log("Melee Attack Start!");
-
-        // Tìm enemy trong vùng tấn công
-        Collider[] hitEnemies = Physics.OverlapSphere(attackPoint.position, attackRange, enemyLayer);
-
-        foreach (Collider enemy in hitEnemies)
-        {
-            Debug.Log("Hit enemy: " + enemy.name);
-            enemy.SendMessage("TakeDamage", damage, SendMessageOptions.DontRequireReceiver);
-
-            // Gắn hiệu ứng nếu có
-            if (hitEffectPrefab != null)
-                Instantiate(hitEffectPrefab, enemy.transform.position, Quaternion.identity);
-        }
+        if (weaponCollider != null)
+            weaponCollider.enabled = true;
     }
+
+    // Gọi từ animation event để kết thúc gây damage
     public void MeleeAttackEnd()
     {
         Debug.Log("Melee Attack End!");
-        // (Tùy chọn) kết thúc frame gây damage
+        if (weaponCollider != null)
+            weaponCollider.enabled = false;
     }
 
-    // Hiển thị vùng đòn đánh trong Scene view để dễ chỉnh
-    void OnDrawGizmosSelected()
+    public void ApplyDamageBuff(float amount, float duration)
     {
-        if (attackPoint != null)
-        {
-            Gizmos.color = Color.red;
-            Gizmos.DrawWireSphere(attackPoint.position, attackRange);
-        }
+        StartCoroutine(DamageBuffCoroutine(amount, duration));
+    }
+
+    private IEnumerator DamageBuffCoroutine(float amount, float duration)
+    {
+        currentDamageBuff += amount;
+        Debug.Log("Damage buffed: +" + amount);
+        yield return new WaitForSeconds(duration);
+        currentDamageBuff -= amount;
+        Debug.Log("Damage buff expired: -" + amount);
     }
 }

@@ -160,6 +160,36 @@ public class BossAI : MonoBehaviour
         }
     }
 
+    void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("Weapon"))
+        {
+            PlayerCombat combat = other.GetComponentInParent<PlayerCombat>();
+            if (combat != null)
+            {
+                int finalDamage = combat.damage;
+                TakeDamage(finalDamage);
+
+                if (finalDamage > 20)
+                {
+                    Debug.Log("Gậy đánh trúng với buff! Gây damage: " + finalDamage);
+                }
+                else if (finalDamage == 20)
+                {
+                    Debug.Log("Gậy đánh trúng! Gây damage mặc định: " + finalDamage);
+                }
+                else
+                {
+                    Debug.Log("Gậy đánh trúng! Damage bất thường: " + finalDamage);
+                }
+            }
+            else
+            {
+                Debug.Log("Không tìm thấy PlayerCombat!");
+            }
+        }
+    }
+
     public void TakeDamage(float damage)
     {
         health -= damage;

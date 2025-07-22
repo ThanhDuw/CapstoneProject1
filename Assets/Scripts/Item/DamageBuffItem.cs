@@ -16,5 +16,14 @@ public class DamageBuffItem : MonoBehaviour
                 Destroy(gameObject);
             }
         }
+        if (other.CompareTag("Player"))
+        {
+            PlayerCombat combat = other.GetComponent<PlayerCombat>();
+            if (combat != null)
+            {
+                combat.ApplyDamageBuff(buffAmount, duration);
+                Destroy(gameObject);
+            }
+        }
     }
 }

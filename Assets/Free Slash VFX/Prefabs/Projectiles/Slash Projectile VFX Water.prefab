@@ -34042,8 +34042,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6111486948328712454}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.70710087, y: -0.0028879645, z: 0.0028879645, w: 0.70710087}
-  m_LocalPosition: {x: -1.9943691, y: 0, z: -0.01629138}
+  m_LocalRotation: {x: 0.5, y: 0.5, z: 0.5, w: 0.5}
+  m_LocalPosition: {x: -0.63303536, y: 0.24999976, z: 0.30872828}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -38882,6 +38882,7 @@ GameObject:
   - component: {fileID: 6111486948785554853}
   - component: {fileID: -4195832045938483119}
   - component: {fileID: -2309930330598303099}
+  - component: {fileID: 920116900042460195}
   m_Layer: 0
   m_Name: Slash Projectile VFX Water
   m_TagString: Untagged
@@ -43808,8 +43809,30 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 10
-  lifetime: 3
-  targetTag: Enemy
+  destroyAfterSeconds: 2
+  damage: 50
+  targetTags: []
+--- !u!65 &920116900042460195
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6111486948785554852}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 4.6665545, y: 0.62805146, z: 2.0973573}
+  m_Center: {x: 0.022390366, y: 0.0014924109, z: 0.20615903}
 --- !u!1001 &6111486947203124672
 PrefabInstance:
   m_ObjectHideFlags: 0
